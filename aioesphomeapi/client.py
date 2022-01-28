@@ -44,12 +44,14 @@ from .api_pb2 import (  # type: ignore
     FanCommandRequest,
     HomeassistantServiceResponse,
     HomeAssistantStateResponse,
+    HomeassistantTriggerResponse,
     LightCommandRequest,
     ListEntitiesDoneResponse,
     ListEntitiesRequest,
     ListEntitiesServicesResponse,
     LockCommandRequest,
     MediaPlayerCommandRequest,
+    ListEntitiesTriggersResponse,
     NumberCommandRequest,
     SelectCommandRequest,
     SirenCommandRequest,
@@ -113,12 +115,14 @@ from .model import (
     FanDirection,
     FanSpeed,
     HomeassistantServiceCall,
+    HomeassistantTrigger,
     LegacyCoverCommand,
     LockCommand,
     LogLevel,
     MediaPlayerCommand,
     UserService,
     UserServiceArgType,
+    UserTrigger,
 )
 from .model import VoiceAssistantAudioSettings as VoiceAssistantAudioSettingsModel
 from .model import (
@@ -390,7 +394,7 @@ class APIClient:
 
     async def list_entities_services(
         self,
-    ) -> tuple[list[EntityInfo], list[UserService]]:
+    ) -> tuple[list[EntityInfo], list[UserService], list[UserTrigger]]:
         msgs = await self._get_connection().send_messages_await_response_complex(
             (ListEntitiesRequest(),),
             lambda msg: type(msg) is not ListEntitiesDoneResponse,
@@ -400,15 +404,19 @@ class APIClient:
         )
         entities: list[EntityInfo] = []
         services: list[UserService] = []
+        triggers: list[UserTrigger] = []
         response_types = LIST_ENTITIES_SERVICES_RESPONSE_TYPES
         for msg in msgs:
             msg_type = type(msg)
             if msg_type is ListEntitiesServicesResponse:
                 services.append(UserService.from_pb(msg))
                 continue
+            if msg_type is ListEntitiesTriggersResponse:
+                triggers.append(UserTrigger.from_pb(msg))
+                continue
             if cls := response_types[msg_type]:
                 entities.append(cls.from_pb(msg))
-        return entities, services
+        return entities, services, triggers
 
     async def subscribe_states(self, on_state: Callable[[EntityState], None]) -> None:
         """Subscribe to state updates."""
@@ -898,6 +906,21 @@ class APIClient:
             )
 
         return stop_notify, remove_callback
+
+    async def subscribe_triggers(
+        self, on_trigger: Callable[[HomeassistantTrigger], None]
+    ) -> None:
+        self._check_authenticated()
+
+        def on_msg(msg: HomeassistantTriggerResponse) -> None:
+            on_trigger(HomeassistantTrigger.from_pb(msg))
+
+        assert self._connection is not None
+        self._connection.send_message_callback_response(
+            SubscribeHomeassistantServicesRequest(),
+            on_msg,
+            (HomeassistantTriggerResponse,),
+        )
 
     async def subscribe_home_assistant_states(
         self, on_state_sub: Callable[[str, str | None], None]

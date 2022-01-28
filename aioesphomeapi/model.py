@@ -840,6 +840,9 @@ class HomeassistantServiceCall(APIModelBase):
         default_factory=dict, converter=_convert_homeassistant_service_map
     )
 
+@dataclass(frozen=True)
+class HomeassistantTrigger(APIModelBase):
+    trigger: str = ""
 
 class UserServiceArgType(APIIntEnum):
     BOOL = 0
@@ -880,6 +883,10 @@ class UserService(APIModelBase):
         default_factory=list, converter=UserServiceArg.convert_list
     )
 
+@dataclass(frozen=True)
+class UserTrigger(APIModelBase):
+    key: int = 0
+    trigger: str = ""
 
 # ==================== BLUETOOTH ====================
 

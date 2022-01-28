@@ -27,6 +27,7 @@ from .api_pb2 import (  # type: ignore
     ListEntitiesSwitchResponse,
     ListEntitiesTextResponse,
     ListEntitiesTextSensorResponse,
+    ListEntitiesTriggersResponse,
     LockStateResponse,
     MediaPlayerStateResponse,
     NumberStateResponse,
@@ -111,4 +112,5 @@ LIST_ENTITIES_SERVICES_RESPONSE_TYPES: dict[Any, type[EntityInfo] | None] = {
     ListEntitiesLockResponse: LockInfo,
     ListEntitiesMediaPlayerResponse: MediaPlayerInfo,
     ListEntitiesAlarmControlPanelResponse: AlarmControlPanelInfo,
+    ListEntitiesTriggersResponse: None,
 }
