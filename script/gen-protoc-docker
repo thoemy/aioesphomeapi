@@ -1,0 +1,1 @@
+docker run --rm -it -v $PWD:/aioesphomeapi ghcr.io/esphome/aioesphomeapi-proto-builder
