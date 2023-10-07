@@ -84,14 +84,14 @@ service APIConnection {
 
 // ==================== HOMEASSISTANT.TRIGGER ====================
 message ListEntitiesTriggersResponse {
-  option (id) = 98;
+  option (id) = 198;
   option (source) = SOURCE_SERVER;
 
   fixed32 key = 1;
   string trigger = 2;
 }
 message HomeassistantTriggerResponse {
-  option (id) = 99;
+  option (id) = 199;
   option (source) = SOURCE_SERVER;
   option (no_delay) = true;
 

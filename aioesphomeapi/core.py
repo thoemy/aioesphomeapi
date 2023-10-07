@@ -79,7 +79,6 @@ from .api_pb2 import (  # type: ignore
     LockStateResponse,
     MediaPlayerCommandRequest,
     MediaPlayerStateResponse,
-    ListEntitiesTriggersResponse,
     NumberCommandRequest,
     NumberStateResponse,
     PingRequest,
@@ -258,8 +257,8 @@ class BluetoothGATTAPIError(APIConnectionError):
 
 
 MESSAGE_TYPE_TO_PROTO = {
-    98: ListEntitiesTriggersResponse,
-    99: HomeassistantTriggerResponse,
+    198: ListEntitiesTriggersResponse,
+    199: HomeassistantTriggerResponse,
     1: HelloRequest,
     2: HelloResponse,
     3: ConnectRequest,
