@@ -80,6 +80,7 @@ from .client_callbacks import (
     on_bluetooth_le_advertising_response,
     on_bluetooth_message_types,
     on_home_assistant_service_response,
+    on_home_assistant_triggers_response,
     on_state_msg,
     on_subscribe_home_assistant_state_response,
 )
@@ -448,6 +449,15 @@ class APIClient:
             SubscribeHomeassistantServicesRequest(),
             partial(on_home_assistant_service_response, on_service_call),
             (HomeassistantServiceResponse,),
+        )
+
+    async def subscribe_triggers(
+        self, on_trigger: Callable[[HomeassistantTrigger], None]
+    ) -> None:
+        self._get_connection().send_message_callback_response(
+            SubscribeHomeassistantServicesRequest(),
+            partial(on_home_assistant_triggers_response, on_trigger),
+            (HomeassistantTriggerResponse,),
         )
 
     async def _send_bluetooth_message_await_response(
@@ -906,21 +916,6 @@ class APIClient:
             )
 
         return stop_notify, remove_callback
-
-    async def subscribe_triggers(
-        self, on_trigger: Callable[[HomeassistantTrigger], None]
-    ) -> None:
-        self._check_authenticated()
-
-        def on_msg(msg: HomeassistantTriggerResponse) -> None:
-            on_trigger(HomeassistantTrigger.from_pb(msg))
-
-        assert self._connection is not None
-        self._connection.send_message_callback_response(
-            SubscribeHomeassistantServicesRequest(),
-            on_msg,
-            (HomeassistantTriggerResponse,),
-        )
 
     async def subscribe_home_assistant_states(
         self, on_state_sub: Callable[[str, str | None], None]

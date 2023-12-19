@@ -26,6 +26,7 @@ from .model import (
     CameraState,
     EntityState,
     HomeassistantServiceCall,
+    HomeassistantTrigger,
 )
 from .model_conversions import SUBSCRIBE_STATES_RESPONSE_TYPES
 
@@ -62,6 +63,11 @@ def on_home_assistant_service_response(
 ) -> None:
     on_service_call(HomeassistantServiceCall.from_pb(msg))
 
+def on_home_assistant_triggers_response(
+    on_trigger: Callable[[HomeassistantServiceCall], None],
+    msg: HomeassistantServiceResponse,
+) -> None:
+    on_trigger(HomeassistantTrigger.from_pb(msg))
 
 def on_bluetooth_le_advertising_response(
     on_bluetooth_le_advertisement: Callable[[BluetoothLEAdvertisement], None],
